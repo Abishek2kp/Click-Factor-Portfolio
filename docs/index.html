@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Click Factor | Video Editor & Motion Graphics Designer</title>
+  <meta name="description" content="Portfolio of Click Factor: documentary edits, SaaS ads and After Effects motion graphics. Open to freelance and agency work.">
+  <meta name="theme-color" content="#0b0b0c">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Click Factor | Video Editor & Motion Graphics Designer">
+  <meta property="og:description" content="Documentary edits, SaaS ads and After Effects motion graphics.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top"><span class="rec" aria-hidden="true"></span>Click Factor</a>
+    <nav aria-label="Main">
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <video class="hero-video" id="heroVideo" src="assets/hero.mp4" poster="assets/hero.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-body">
+        <p class="hero-role">Video Editor &amp; Motion Graphics Designer</p>
+        <h1>Every frame earns the <em>click.</em></h1>
+        <div class="hero-foot">
+          <div class="hero-actions">
+            <a class="btn btn-solid" href="#work">Watch the work</a>
+            <a class="btn" href="#contact">Get in touch</a>
+          </div>
+          <p class="timecode" aria-hidden="true"><span class="rec"></span><span id="timecode">00:00:00:00</span></p>
+        </div>
+      </div>
+    </section>
+
+    <div id="work"></div>
+
+    <section class="about" id="about">
+      <p class="label">About</p>
+      <div class="about-grid">
+        <h2>Two years of cutting full time. Now open to freelance and agency work.</h2>
+        <div class="about-side">
+          <p>I'm a full-time video editor and motion designer. I make documentary edits, product ads and animated explainers, built to hold attention from the first frame.</p>
+          <dl>
+            <div><dt>Experience</dt><dd>2 years, full time</dd></div>
+            <div><dt>Open to</dt><dd>Freelance and agency roles</dd></div>
+            <div><dt>Toolkit</dt><dd>Premiere Pro, After Effects, Illustrator, ElevenLabs, Grok, Claude</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="contact" id="contact">
+    <p class="label">Contact</p>
+    <h2>Let's cut something.</h2>
+    <div class="contact-links">
+      <a class="contact-link" href="mailto:clickfactor0@gmail.com">clickfactor0@gmail.com</a>
+      <button class="copy" id="copyEmail" type="button">Copy email</button>
+    </div>
+    <div class="contact-links">
+      <a class="contact-link" href="https://www.instagram.com/clickfactor_/" target="_blank" rel="noopener">@clickfactor_</a>
+    </div>
+    <p class="legal">&copy; <span id="year">2026</span> Click Factor</p>
+  </footer>
+
+  <dialog class="viewer" id="viewer" aria-labelledby="viewerTitle">
+    <div class="viewer-bar">
+      <p class="viewer-title" id="viewerTitle"></p>
+      <div class="viewer-actions">
+        <button type="button" id="viewerPrev" aria-label="Previous video">&larr;</button>
+        <button type="button" id="viewerNext" aria-label="Next video">&rarr;</button>
+        <button type="button" id="viewerClose" aria-label="Close video">&times;</button>
+      </div>
+    </div>
+    <div class="viewer-stage" id="viewerStage">
+      <video id="viewerVideo" controls playsinline></video>
+    </div>
+  </dialog>
+
+  <script src="videos.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
