@@ -2,6 +2,7 @@ const RATIO = { wide: 16 / 9, tall: 9 / 16 };
 const MIN_ROW_RATIO = 2.2;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
+const useCursor = canHover && !reducedMotion;
 const allVideos = SECTIONS.flatMap((s) => s.videos);
 
 /* Group videos into rows whose tiles share one height. */
@@ -29,8 +30,22 @@ function el(tag, className, text) {
   return node;
 }
 
+/* Custom "Play" cursor over videos on devices with a mouse. */
+let cursor;
+if (useCursor) {
+  document.documentElement.classList.add("has-cursor");
+  cursor = el("div", "cursor");
+  cursor.setAttribute("aria-hidden", "true");
+  cursor.append(el("span", "", "Play"));
+  document.body.append(cursor);
+  addEventListener("pointermove", (event) => {
+    cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+  }, { passive: true });
+}
+
 function renderCard(video, isLoneTall) {
   const card = el("article", `card card-${video.format}${isLoneTall ? " card-lone" : ""}`);
+  if (video.tint) card.dataset.tint = video.tint;
 
   const tile = el("button", `tile${video.bright ? " tile-bright" : ""}`);
   tile.type = "button";
@@ -49,16 +64,18 @@ function renderCard(video, isLoneTall) {
 
   tile.append(img, play, runtime);
   tile.addEventListener("click", () => openViewer(video));
+  if (useCursor) {
+    tile.addEventListener("mouseenter", () => cursor.classList.add("on"));
+    tile.addEventListener("mouseleave", () => cursor.classList.remove("on"));
+  }
   if (canHover && !reducedMotion) attachPreview(tile, video);
 
   const caption = el("div", "caption");
-  const tags = el("ul", "tags");
-  video.tools.forEach((tool) => tags.append(el("li", "", tool)));
   caption.append(
     el("p", "kind", video.kind),
     el("h3", "", video.title),
     el("p", "desc", video.description),
-    tags
+    el("p", "tools", video.tools.join(" / "))
   );
 
   card.append(tile, caption);
@@ -91,16 +108,14 @@ function attachPreview(tile, video) {
 
 function renderSections() {
   const work = document.getElementById("work");
-  SECTIONS.forEach((section, index) => {
+  SECTIONS.forEach((section) => {
     const block = el("section", "work");
     block.id = section.id;
 
     const head = el("div", "work-head");
-    const titles = el("div");
-    titles.append(el("h2", "", section.title), el("p", "note", section.note));
-    const number = String(index + 1).padStart(2, "0");
-    const count = section.videos.length;
-    head.append(titles, el("p", "label", `${number} / ${count} ${count === 1 ? "film" : "films"}`));
+    const title = el("h2", "mask");
+    title.append(el("span", "", section.title));
+    head.append(title, el("p", "note reveal", section.note));
     block.append(head);
 
     /* On phones a leftover vertical video sits beside its caption. */
@@ -108,9 +123,8 @@ function renderSections() {
     const loneTall = talls.length % 2 === 1 ? talls[talls.length - 1] : null;
 
     const grid = el("div", "grid");
-    const rows = buildRows(section.videos);
     const fullRatio = RATIO.wide + RATIO.tall;
-    rows.forEach((videos) => {
+    buildRows(section.videos).forEach((videos) => {
       const row = el("div", "row");
       const sum = videos.reduce((total, v) => total + RATIO[v.format], 0);
       const columns = videos.map((v) => `${RATIO[v.format]}fr`);
@@ -141,6 +155,7 @@ function loadInViewer(video) {
 }
 
 function openViewer(video) {
+  if (cursor) cursor.classList.remove("on");
   viewer.showModal();
   loadInViewer(video);
 }
@@ -162,35 +177,34 @@ viewer.addEventListener("close", () => {
   viewerVideo.load();
 });
 
-/* Hero: pause off screen and run the timecode readout. */
+/* Hero video only plays while it is on screen. */
 const hero = document.getElementById("heroVideo");
-const timecode = document.getElementById("timecode");
-const FPS = 30;
-const pad = (n) => String(n).padStart(2, "0");
-let heroVisible = true;
-
-function tick() {
-  if (!heroVisible) return;
-  const t = hero.currentTime;
-  const seconds = Math.floor(t);
-  timecode.textContent = `00:00:${pad(seconds)}:${pad(Math.floor((t - seconds) * FPS))}`;
-  requestAnimationFrame(tick);
-}
-
 if (reducedMotion) {
   hero.removeAttribute("autoplay");
   hero.pause();
 } else {
   new IntersectionObserver(([entry]) => {
-    heroVisible = entry.isIntersecting;
-    if (heroVisible) {
-      hero.play().catch(() => {});
-      requestAnimationFrame(tick);
-    } else {
-      hero.pause();
-    }
+    if (entry.isIntersecting) hero.play().catch(() => {});
+    else hero.pause();
   }).observe(hero);
 }
+
+/* Never leave the headline hidden if its entrance animation fails to start. */
+setTimeout(() => {
+  document.getAnimations().forEach((animation) => {
+    if (animation.pending || animation.currentTime === 0) animation.finish();
+  });
+}, 1800);
+
+/* Slide the nav away while scrolling down, bring it back when scrolling up. */
+const nav = document.querySelector(".nav");
+let lastScrollY = scrollY;
+addEventListener("scroll", () => {
+  const y = scrollY;
+  if (Math.abs(y - lastScrollY) < 6) return;
+  nav.classList.toggle("nav-hidden", y > lastScrollY && y > innerHeight * 0.5);
+  lastScrollY = y;
+}, { passive: true });
 
 /* Copy email */
 const copyButton = document.getElementById("copyEmail");
@@ -206,3 +220,26 @@ copyButton.addEventListener("click", async () => {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 renderSections();
+
+/* Reveal elements once as they scroll into view. */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add("in");
+    revealObserver.unobserve(entry.target);
+  });
+}, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+document.querySelectorAll(".reveal, .mask, .card").forEach((node) => revealObserver.observe(node));
+
+/* Grade the page background to the video in the middle of the screen. */
+const inFocus = new Set();
+const focusObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) inFocus.add(entry.target);
+    else inFocus.delete(entry.target);
+  });
+  const cards = [...inFocus];
+  const lead = cards.find((card) => card.classList.contains("card-wide")) || cards[0];
+  document.body.style.backgroundColor = lead ? lead.dataset.tint : "";
+}, { rootMargin: "-45% 0px -45% 0px" });
+document.querySelectorAll(".card[data-tint]").forEach((card) => focusObserver.observe(card));

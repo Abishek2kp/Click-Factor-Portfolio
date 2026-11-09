@@ -8,6 +8,7 @@
      assets/previews/my-video.mp4.
   3. Add an entry below. Layout is automatic. Use format "wide" for 16:9 and
      "tall" for 9:16. Keep each file under 100 MB.
+     "tint" is the very dark colour the page fades to while that video is on screen.
 */
 const SECTIONS = [
   {
@@ -17,6 +18,7 @@ const SECTIONS = [
     videos: [
       {
         slug: "zeno",
+        tint: "#170d2e",
         title: "The Story of Zeno",
         kind: "Documentary",
         description: "A merchant loses everything at sea and a philosophy is born.",
@@ -26,6 +28,7 @@ const SECTIONS = [
       },
       {
         slug: "neuron",
+        tint: "#1f1107",
         title: "Neuron",
         kind: "Client ad",
         description: "Product ad for a clinic platform, from WhatsApp to diet chart.",
@@ -35,6 +38,7 @@ const SECTIONS = [
       },
       {
         slug: "mockly",
+        tint: "#210d05",
         title: "Mockly",
         kind: "Spec ad",
         description: "A concept SaaS launch ad where every frame is the pitch.",
@@ -44,6 +48,7 @@ const SECTIONS = [
       },
       {
         slug: "universe-25",
+        tint: "#0e1140",
         title: "Universe 25",
         kind: "Documentary",
         description: "The mouse utopia experiment that ended in extinction.",
@@ -60,6 +65,7 @@ const SECTIONS = [
     videos: [
       {
         slug: "editor-ad",
+        tint: "#1a0d0e",
         title: "Looking for a Video Editor?",
         kind: "Self-promo ad",
         description: "A roaming spotlight turns a hiring question into a pitch.",
@@ -69,6 +75,7 @@ const SECTIONS = [
       },
       {
         slug: "rule-of-72",
+        tint: "#200f0a",
         title: "The Rule of 72",
         kind: "Finance explainer",
         description: "How long your money takes to double, in 21 seconds.",
